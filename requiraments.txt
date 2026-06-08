@@ -1,0 +1,26 @@
+# Core RAG i LLM framework
+langchain
+langchain-community
+langchain-text-splitters
+pypdf
+beautifulsoup4
+
+# Vektorska baza i Embedding modeli (eksplicitno CPU verzija za FAISS)
+faiss-cpu
+sentence-transformers
+
+# Pokretanje lokalnog LLM-a na CPU-u
+llama-cpp-python
+
+# GUI i Vizualizacija
+streamlit
+plotly
+scikit-learn
+
+# Evaluacijske metrike
+nltk
+rouge-score
+pandas
+
+# Pomoćne biblioteke
+numpy
