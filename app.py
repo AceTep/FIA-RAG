@@ -320,34 +320,25 @@ for msg in st.session_state.messages:
 
 user_input = st.chat_input("Ask about F1 2026 regulations...")
 if user_input:
-    # 1. Prikaži korisnikov upit
     with st.chat_message("user"):
         st.markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
     
-    # 2. Pripremi odgovor asistenta
     with st.chat_message("assistant"):
-        # Prvo brzo dohvati dokumente (trebaju nam za izvore i PCA mapu)
         with st.spinner("Retrieving context..."):
             docs = retriever.invoke(user_input)
         
-        # Definiraj generator koji će yield-ati tokene jedan po jedan
         def response_generator():
-            # POPRAVAK: Prosljeđujemo string, a ne dict!
-            # chain.stream će automatski proslijediti string i retrieveru i promptu.
             for chunk in chain.stream(user_input):
                 yield chunk
         
-        # Streamlit će ovo prikazivati u realnom vremenu i vratiti cijeli tekst na kraju
         full_answer = st.write_stream(response_generator())
         
-        # 3. Prikaži izvore (nakon što je generiranje teksta gotovo)
         sources = [d.page_content for d in docs]
         with st.expander("Sources used", expanded=False):
             for i, src in enumerate(sources, 1):
                 st.caption(f"**Chunk {i}:** {src[:300]}{'...' if len(src) > 300 else ''}")
 
-        # 4. Prikaži Embedding mapu (ako je uključeno)
         fig = None
         if show_map:
             with st.expander("Embedding map – zašto ovi chunkovi?", expanded=False):
@@ -355,12 +346,11 @@ if user_input:
                     fig = build_embedding_figure(user_input, docs)
                 st.plotly_chart(fig, use_container_width=True, key=f"map_live_{uuid.uuid4()}")
 
-    # 5. Spremi u session state za povijest razgovora
     msg_id = str(uuid.uuid4())
     st.session_state.messages.append({
         "id":            msg_id,
         "role":          "assistant",
-        "content":       full_answer,  # st.write_stream vraća potpuni sastavljeni string
+        "content":       full_answer,  
         "sources":       sources,
         "embedding_fig": fig,
     })
